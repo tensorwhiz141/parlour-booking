@@ -1,0 +1,22 @@
+.input-group {
+    position: relative;
+}
+
+.input-group input {
+    width: 100%;
+    padding-right: 40px; /* Add padding to make space for the eye icon */
+}
+
+.input-group .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    user-select: none;
+    color: #6b7280; /* Match your text-gray-700 for consistency */
+}
+
+.input-group .toggle-password:hover {
+    color: #4b5563; /* Slightly darker on hover, matching text-gray-800 */
+}
