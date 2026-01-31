@@ -99,23 +99,10 @@ export const registerUser = async (userData: User): Promise<ApiResponse<User>> =
   }
 };
 
-// Request OTP for login - Step 1
-export const requestOTP = async (email: string, password: string): Promise<ApiResponse<{ email: string; expiresAt: string }>> => {
+// Login user
+export const loginUser = async (email: string, password: string): Promise<ApiResponse<User>> => {
   try {
-    const response = await api.post('/auth/request-otp', { email, password });
-    return response.data;
-  } catch (error: any) {
-    return {
-      success: false,
-      error: error.response?.data?.message || 'Failed to request OTP',
-    };
-  }
-};
-
-// Verify OTP and complete login - Step 2
-export const verifyOTP = async (email: string, otp: string): Promise<ApiResponse<User>> => {
-  try {
-    const response = await api.post('/auth/verify-otp', { email, otp });
+    const response = await api.post('/auth/login', { email, password });
     
     // Save token and user to local storage if successful
     if (response.data.success && response.data.token) {
@@ -123,32 +110,6 @@ export const verifyOTP = async (email: string, otp: string): Promise<ApiResponse
       localStorage.setItem('user', JSON.stringify(response.data.data));
     }
     
-    return response.data;
-  } catch (error: any) {
-    return {
-      success: false,
-      error: error.response?.data?.message || 'Failed to verify OTP',
-    };
-  }
-};
-
-// Resend OTP
-export const resendOTP = async (email: string): Promise<ApiResponse<{ expiresAt: string }>> => {
-  try {
-    const response = await api.post('/auth/resend-otp', { email });
-    return response.data;
-  } catch (error: any) {
-    return {
-      success: false,
-      error: error.response?.data?.message || 'Failed to resend OTP',
-    };
-  }
-};
-
-// Original login function (kept for backward compatibility)
-export const loginUser = async (email: string, password: string): Promise<ApiResponse<User>> => {
-  try {
-    const response = await api.post('/auth/login', { email, password });
     return response.data;
   } catch (error: any) {
     return {
