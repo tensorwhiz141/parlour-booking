@@ -1,25 +1,9 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
-
-// Verify transporter configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Email transporter configuration error:', error);
-  } else {
-    console.log('Email transporter is ready to send emails');
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * Send OTP email to user
@@ -29,8 +13,11 @@ transporter.verify((error, success) => {
  */
 export const sendOTPEmail = async (email, otp) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    console.log('Attempting to send OTP to:', email);
+    console.log('Using from address:', process.env.EMAIL_FROM || 'onboarding@resend.dev');
+    
+    const result = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'onboarding@resend.dev', // Use your verified domain or onboarding@resend.dev
       to: email,
       subject: 'Your Login OTP - Ananda Beauty Parlour',
       html: `
@@ -68,14 +55,13 @@ export const sendOTPEmail = async (email, otp) => {
           </div>
         </div>
       `
-    };
-
-    const result = await transporter.sendMail(mailOptions);
-    console.log('OTP email sent successfully to:', email);
-    return { success: true, messageId: result.messageId };
+    });
+    
+    console.log('OTP email sent successfully to:', email, 'Response:', result);
+    return { success: true, messageId: result.data?.id };
   } catch (error) {
-    console.error('Error sending OTP email:', error);
-    return { success: false, error: error.message };
+    console.error('Error sending OTP email:', error?.response?.data || error?.message || error);
+    return { success: false, error: error?.message || 'Unknown error occurred' };
   }
 };
 
@@ -86,5 +72,3 @@ export const sendOTPEmail = async (email, otp) => {
 export const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
-
-export default transporter;
