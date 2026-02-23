@@ -22,8 +22,9 @@ app.use(
       'http://localhost:5173',
       'https://parlour-booking-v7ds.vercel.app'
     ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
